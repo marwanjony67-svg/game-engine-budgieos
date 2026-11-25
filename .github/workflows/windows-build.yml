@@ -1,0 +1,46 @@
+name: Build BudgieOS Engine
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -A x64
+
+      - name: Build Release
+        run: cmake --build build --config Release --parallel
+
+      - name: Package executable
+        shell: pwsh
+        run: |
+          $exe = "build/Release/BudgieOS-Engine.exe"
+          if (!(Test-Path $exe)) {
+            throw "Expected executable was not produced: $exe"
+          }
+          New-Item -ItemType Directory -Force -Path package | Out-Null
+          Copy-Item $exe package/
+          @"
+          BudgieOS Engine 1.0
+          Windows x64 build
+          "@ | Set-Content package/BUILD-INFO.txt
+
+      - name: Upload Windows x64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BudgieOS-Engine-Windows-x64
+          path: package/
+          if-no-files-found: error
+          retention-days: 30
