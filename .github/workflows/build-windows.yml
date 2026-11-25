@@ -1,0 +1,34 @@
+name: Build BudgieOS Engine
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -A x64
+      - name: Build Release
+        run: cmake --build build --config Release
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: BudgieOS-Engine-Windows-x64
+          path: build/Release/BudgieOS-Engine.exe
+  linux-core-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build
+      - name: Build portable core
+        run: cmake --build build --parallel
+      - name: Run core check
+        run: ./build/budgie-engine-core-check
