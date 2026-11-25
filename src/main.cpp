@@ -6,7 +6,7 @@ int main() {
     budgie::Scene scene;
     scene.createEntity("Camera");
     scene.createEntity("Directional Light");
-    std::cout << engine.welcome() << '\\n';
-    std::cout << "Scene entities: " << scene.entities().size() << '\\n';
+    std::cout << engine.welcome() << '\n';
+    std::cout << "Scene entities: " << scene.entities().size() << '\n';
     return 0;
 }
